@@ -23,4 +23,4 @@ def test_fetch_to_markdown(tmp_path) -> None:
     assert output_path.read_text(encoding="utf-8")
     assert markdown
     print(f"Markdown saved to {output_path}")
-    assert "glm" in markdown.lower()
+    assert "example domains" in markdown.lower()

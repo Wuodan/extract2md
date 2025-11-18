@@ -54,6 +54,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=30.0,
         help="Request timeout in seconds (default: 30)",
     )
+    parser.add_argument(
+        "--rewrite-relative-urls",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Rewrite relative href/src attributes (default: enabled)",
+    )
+    parser.add_argument(
+        "--base-url",
+        help=(
+            "Optional base URL used to resolve relative links for stdin or file sources "
+            "(overrides automatic detection)"
+        ),
+    )
     return parser
 
 
@@ -77,11 +90,14 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         content, content_type = None, None
+        base_url: str | None = args.base_url
 
         if args.source == "-":
             content = sys.stdin.read()
 
         elif _is_url(args.source):
+            if base_url is None:
+                base_url = args.source
             content, content_type = fetch(
                 args.source,
                 user_agent=args.user_agent or DEFAULT_USER_AGENT,
@@ -91,10 +107,18 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         else:
-            content = Path(args.source).read_text(encoding="utf-8")
+            source_path = Path(args.source)
+            content = source_path.read_text(encoding="utf-8")
+            if base_url is None:
+                base_url = source_path.resolve().as_uri()
 
         if not args.raw:
-            content = html_to_markdown(content, content_type)
+            content = html_to_markdown(
+                content,
+                content_type,
+                base_url=base_url,
+                rewrite_relative_urls=args.rewrite_relative_urls,
+            )
 
         if args.output is not None:
             _write_output_file(content, args.output)

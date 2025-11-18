@@ -33,8 +33,6 @@ fetch-markdown --output sample-output.md https://www.iana.org/help/example-domai
 ### 3. Convert previously saved HTML (files or stdin)
 
 ```bash
-# get html file
-curl -Ss https://www.iana.org/help/example-domains > sample-page.html
 # convert file
 fetch-markdown sample-page.html
 # or from stdin
@@ -56,6 +54,9 @@ fetch-markdown --raw https://example.com
 - `--ignore-robots`: skip robots.txt validation (use sparingly).
 - `--proxy URL`: HTTP(S) proxy forwarded to httpx.
 - `--timeout SECONDS`: request timeout (default 30 seconds).
+- `--rewrite-relative-urls/--no-rewrite-relative-urls`:  
+  enable or disable rewriting relative `href`/`src` attributes to absolute links (default on).
+- `--base-url URL`: optional base URL for rewriting relative urls (default `source`).
 
 ## Python Library usage
 
@@ -84,6 +85,19 @@ from fetch_markdown import html_to_markdown
 
 html = "<html><body><h1>Offline HTML</h1></body></html>"
 markdown_from_html = html_to_markdown(html)
+
+# Optionally disable replacing relative links with absolute URLs
+markdown_custom = html_to_markdown(
+    html,
+    rewrite_relative_urls=False,
+)
+
+# Or replace relative links with a custom base URL
+markdown_custom = html_to_markdown(
+    html,
+    rewrite_relative_urls=False,
+    base_url="https://example.com/docs/",
+)
 ```
 
 ### Additional public methods
@@ -101,6 +115,8 @@ raw_html, content_type = fetch("https://example.com/docs")
 
 - The CLI and library both fetch live webpages from URLs; network availability and site
   rate limits apply.
+- Set the `FETCH_MARKDOWN_NODE_PATH` environment variable to the Node.js binary (or its
+  directory) if Readability.js cannot find `node` on your `PATH`.
 - Inspired by the [Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
 - Thanks go to these libraries for the heavy lifting:
     - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
