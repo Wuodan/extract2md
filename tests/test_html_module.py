@@ -5,8 +5,6 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-import pytest
-
 from fetch_markdown._html import _ensure_node_path, _extract_content_from_html, to_markdown
 
 
@@ -54,8 +52,8 @@ def test_extract_content_handles_empty_payload(monkeypatch):
     )
 
     assert (
-        _extract_content_from_html("<html></html>")
-        == "<error>Page failed to be simplified from HTML</error>"
+            _extract_content_from_html("<html></html>")
+            == "<error>Page failed to be simplified from HTML</error>"
     )
 
 

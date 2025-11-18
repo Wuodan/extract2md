@@ -8,7 +8,6 @@ from typing import Any, Optional
 
 import markdownify
 import readabilipy.simple_json
-
 from fetch_markdown.models import (
     Html2MarkdownContentTypeError,
     Html2MarkdownToMarkdownError,
@@ -18,14 +17,14 @@ HTML_TAG_THRESHOLD = 100
 
 
 def to_markdown(
-    html: str,
-    content_type: Optional[Any] = None,
+        html: str,
+        content_type: Optional[Any] = None,
 ) -> str:
     """Convert raw HTML into Markdown."""
 
     content_type_value = str(content_type or "")
     is_content_type_html = (
-        not content_type_value or "text/html" in content_type_value.lower()
+            not content_type_value or "text/html" in content_type_value.lower()
     )
     if not is_content_type_html:
         raise Html2MarkdownContentTypeError(
@@ -44,7 +43,7 @@ def to_markdown(
 
 
 def _extract_content_from_html(
-    html: str,
+        html: str,
 ) -> str:
     """Run Readability + markdownify to simplify an HTML document."""
     _ensure_node_path()

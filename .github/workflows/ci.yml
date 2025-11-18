@@ -28,7 +28,7 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Lint
-        run: ruff check src/fetch_markdown tests
+        run: ruff check src tests
 
       - name: Run tests
         run: pytest --cov=src --cov-report=term-missing

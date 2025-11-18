@@ -14,11 +14,11 @@ DEFAULT_USER_AGENT = _DEFAULT_USER_AGENT
 
 
 def html_to_markdown(
-    html: str,
-    content_type: Any | None = None,
-    *,
-    base_url: str | None = None,
-    rewrite_relative_urls: bool = True,
+        html: str,
+        content_type: Any | None = None,
+        *,
+        base_url: str | None = None,
+        rewrite_relative_urls: bool = True,
 ) -> str:
     """Convert HTML into Markdown."""
 
@@ -69,14 +69,14 @@ def fetch(
 
 
 def fetch_to_markdown(
-    url: str,
-    *,
-    user_agent: str | None = None,
-    ignore_robots_txt: bool = False,
-    proxy_url: str | None = None,
-    timeout: float = 30.0,
-    base_url: str | None = None,
-    rewrite_relative_urls: bool = True,
+        url: str,
+        *,
+        user_agent: str | None = None,
+        ignore_robots_txt: bool = False,
+        proxy_url: str | None = None,
+        timeout: float = 30.0,
+        base_url: str | None = None,
+        rewrite_relative_urls: bool = True,
 ) -> str:
     """Fetch the given URL and return the simplified Markdown content."""
 
