@@ -5,3 +5,4 @@
 dist/
 **/_version.py
 **/.coverage
+/tmp_submodules/servers/
