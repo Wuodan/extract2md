@@ -1,10 +1,9 @@
 # fetch-markdown
 
-`fetch-markdown` fetches a webpage and returns cleaned Markdown, either via a
-library call or a CLI command.
+`fetch_markdown` is all about “HTML in → Markdown out.” You can start from a live
+URL, a file on disk, or an already-loaded HTML string.
 
-Much of the extraction logic is adapted from the
-[Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
+It can be used from CLI or as a Python library.
 
 ## Installation
 
@@ -12,47 +11,79 @@ Much of the extraction logic is adapted from the
 pip install fetch-markdown
 ```
 
-## Library usage
-
-```python
-from pathlib import Path
-from fetch_markdown import fetch_markdown
-
-markdown = fetch_markdown("https://huggingface.co/unsloth/GLM-4.6-GGUF")
-print(markdown[:200])
-
-output_path = Path("/tmp/model-card.md")
-fetch_markdown(
-    "https://huggingface.co/unsloth/GLM-4.6-GGUF",
-    output_path=output_path,
-)
-```
-
 ## CLI usage
 
 ```bash
-python -m fetch_markdown https://huggingface.co/unsloth/GLM-4.6-GGUF
+# fetch a URL and display Markdown
+fetch-markdown https://huggingface.co/unsloth/GLM-4.6-GGUF
 
-# or
+# fetch and write to a file
 fetch-markdown --output output.md https://huggingface.co/unsloth/GLM-4.6-GGUF
+
+# convert previously saved HTML (files or stdin)
+fetch-markdown /tmp/page.html
+cat page.html | fetch-markdown -
+
+# skip Markdown conversion and emit the HTML verbatim
+fetch-markdown --raw https://example.com
 ```
 
 ## Parameters
 
-The library function and CLI share the same core arguments/options:
+- `source`: URL, filesystem path, or `-` to read HTML from stdin.
+- `-o/--output PATH`: optional destination file (stdout is the default).
+- `--raw`: bypass HTML-to-Markdown conversion and emit the response body.
+- `--user-agent STRING`: override the default identifier.
+- `--ignore-robots`: skip robots.txt validation (use sparingly).
+- `--proxy URL`: HTTP(S) proxy forwarded to httpx.
+- `--timeout SECONDS`: request timeout (default 30 seconds).
 
-- `url` (positional for CLI / first argument for library): target page.
-- `output_path` / `-o/--output PATH`: optional destination file; stdout is used
-  when omitted.
-- `force_raw` / `--raw`: skip simplification and emit the response body verbatim.
-- `user_agent` / `--user-agent STRING`: override the default identifier.
-- `ignore_robots_txt` / `--ignore-robots`: skip robots.txt checks (use sparingly).
-- `proxy_url` / `--proxy URL`: HTTP(S) proxy forwarded to httpx.
-- `timeout` / `--timeout SECONDS`: request timeout (default 30 seconds).
+## Python Library usage
+
+`fetch_markdown` can also be used as a Python library.
+
+### 1. Fetch a URL and get Markdown
+
+```python
+from fetch_markdown import fetch_to_markdown
+
+markdown = fetch_to_markdown("https://huggingface.co/unsloth/GLM-4.6-GGUF")
+```
+
+### 2. Convert a previously saved HTML file
+
+```python
+from fetch_markdown import file_to_markdown
+
+markdown_from_file = file_to_markdown("/tmp/page.html")
+```
+
+### 3. Convert an HTML string you already have
+
+```python
+from fetch_markdown import html_to_markdown
+
+html = "<html><body><h1>Offline HTML</h1></body></html>"
+markdown_from_html = html_to_markdown(html)
+```
+
+### Additional public methods
+
+Need to store markup or run your own converter? Use `fetch` and skip the Markdown
+step entirely:
+
+```python
+from fetch_markdown import fetch
+
+raw_html, content_type = fetch("https://example.com/docs")
+```
 
 ## Notes
 
-- The CLI and library both fetch live webpages; network availability and site
+- The CLI and library both fetch live webpages from URLs; network availability and site
   rate limits apply.
-- Content extraction follows the upstream MCP `fetch` server, so results mirror
-  that behavior when converting pages to Markdown.
+- Inspired by the [Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
+- Thanks go to these libraries for the heavy lifting:
+    - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
+      Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package
+    - [Markdownify](https://github.com/matthewwithanm/python-markdownify)

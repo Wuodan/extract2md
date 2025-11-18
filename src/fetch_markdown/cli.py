@@ -5,15 +5,22 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
-from .core import DEFAULT_USER_AGENT, FetchMarkdownError, fetch_markdown
+from .core import DEFAULT_USER_AGENT, fetch, html_to_markdown
+from .models import Html2MarkdownError
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Fetch a web page and output cleaned Markdown",
     )
-    parser.add_argument("url", help="URL to fetch")
+    parser.add_argument(
+        "source",
+        help=(
+            "URL to fetch, a local HTML file, or '-' to read HTML from stdin"
+        ),
+    )
     parser.add_argument(
         "-o",
         "--output",
@@ -49,29 +56,54 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _is_url(value: str) -> bool:
+    parsed = urlparse(value)
+    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+
+
+def _write_output_file(content: str, output_path: Path | str):
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
     try:
-        markdown = fetch_markdown(
-            args.url,
-            output_path=args.output,
-            force_raw=args.raw,
-            user_agent=args.user_agent or DEFAULT_USER_AGENT,
-            ignore_robots_txt=args.ignore_robots,
-            proxy_url=args.proxy,
-            timeout=args.timeout,
-        )
-    except (FetchMarkdownError, ValueError) as exc:
+        content, content_type = None, None
+
+        if args.source == "-":
+            content = sys.stdin.read()
+
+        elif _is_url(args.source):
+            content, content_type = fetch(
+                args.source,
+                user_agent=args.user_agent or DEFAULT_USER_AGENT,
+                ignore_robots_txt=args.ignore_robots,
+                proxy_url=args.proxy,
+                timeout=args.timeout,
+            )
+
+        else:
+            content = Path(args.source).read_text(encoding="utf-8")
+
+        if not args.raw:
+            content = html_to_markdown(content, content_type)
+
+        if args.output is not None:
+            _write_output_file(content, args.output)
+
+    except (Html2MarkdownError, ValueError, OSError) as exc:
         parser.exit(1, f"error: {exc}\n")
 
     if args.output is None:
-        print(markdown)
+        print(content)
     else:
         print(f"Markdown written to {args.output.resolve()}", file=sys.stderr)
 
     return 0
 
 
-__all__ = ["main", "build_parser"]
+__all__ = ["main"]

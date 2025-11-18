@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
-from fetch_markdown import FetchMarkdownError, fetch_markdown
+from fetch_markdown import Html2MarkdownError, fetch_to_markdown
 
 HF_URL = "https://huggingface.co/unsloth/GLM-4.6-GGUF"
 
 
-def test_fetch_markdown_huggingface(tmp_path: Path) -> None:
-    output_path = tmp_path / "huggingface.md"
+def test_fetch_to_markdown_huggingface(tmp_path) -> None:
     try:
-        markdown = fetch_markdown(HF_URL, output_path=output_path)
-    except FetchMarkdownError as exc:  # pragma: no cover - depends on network
+        markdown = fetch_to_markdown(HF_URL)
+    except Html2MarkdownError as exc:  # pragma: no cover - depends on network
         pytest.skip(f"Unable to contact Hugging Face: {exc}")
 
+    output_path = tmp_path / "huggingface.md"
+    output_path.write_text(markdown, encoding="utf-8")
     assert output_path.exists()
     assert output_path.read_text(encoding="utf-8")
     assert markdown
