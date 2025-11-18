@@ -1,15 +1,15 @@
 # fetch-markdown
 
-`fetch-markdown` is a lightweight Python tool that reuses the content
-extraction logic from Anthropic's `mcp_server_fetch` project to turn web pages
-into cleaned Markdown. It can be used either as a small library or through a
-command-line interface. Upstream code lives at
-https://github.com/modelcontextprotocol/servers/tree/main/src/fetch.
+`fetch-markdown` fetches a webpage and returns cleaned Markdown, either via a
+library call or a CLI command.
+
+Much of the extraction logic is adapted from the
+[Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
 
 ## Installation
 
 ```bash
-pip install -r requirements-dev.txt  # includes runtime deps and pytest/ruff
+pip install fetch-markdown
 ```
 
 ## Library usage
@@ -50,10 +50,9 @@ The library function and CLI share the same core arguments/options:
 - `proxy_url` / `--proxy URL`: HTTP(S) proxy forwarded to httpx.
 - `timeout` / `--timeout SECONDS`: request timeout (default 30 seconds).
 
-## Development
+## Notes
 
-- Lint with `ruff check fetch_markdown tests`.
-- Run tests with `pytest --cov=fetch_markdown --cov-report=term-missing`.
-
-The tests depend on the Hugging Face website being reachable. They will be
-skipped automatically if the network call fails.
+- The CLI and library both fetch live webpages; network availability and site
+  rate limits apply.
+- Content extraction follows the upstream MCP `fetch` server, so results mirror
+  that behavior when converting pages to Markdown.
