@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - `src/fetch_markdown/` holds the library and CLI entry points; `core.py` mirrors the MCP `fetch` logic, while `cli.py` exposes `fetch-markdown` and `python -m fetch_markdown`.
-- `tests/` contains Pytest suites: `test_fetch_markdown.py` hits the live Hugging Face page, and `test_cli.py` checks stdout/file behavior.
+- `tests/` contains Pytest suites: `test_fetch_markdown.py` hits the live iana.org page, and `test_cli.py` checks stdout/file behavior.
 - `.github/workflows/ci.yml` defines the GH Actions pipeline; `requirements*.txt` and `pyproject.toml` declare dependencies and build metadata.
 
 ## Build, Test, and Development Commands
@@ -19,7 +19,7 @@
 
 ## Testing Guidelines
 - Use Pytest; name files `test_*.py` and functions `test_*`.
-- Network-dependent tests should skip gracefully on failures (see `test_fetch_markdown_huggingface` for pattern) and print artifact paths.
+- Network-dependent tests should skip gracefully on failures (see `test_fetch_to_markdown` for pattern) and print artifact paths.
 - Maintain coverage near current CI expectations (~85% overall) and ensure new features include unit tests or CLI regression checks.
 
 ## Commit & Pull Request Guidelines

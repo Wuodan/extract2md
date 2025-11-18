@@ -11,20 +11,39 @@ It can be used from CLI or as a Python library.
 pip install fetch-markdown
 ```
 
+Prerequisites:
+
+- Python 3.10+ runtime
+- Node.js (recommended for best results; powers Readability.js content extraction)
+
 ## CLI usage
 
+### 1. Fetch a URL and display Markdown
+
 ```bash
-# fetch a URL and display Markdown
-fetch-markdown https://huggingface.co/unsloth/GLM-4.6-GGUF
+fetch-markdown https://www.iana.org/help/example-domains
+```
 
-# fetch and write to a file
-fetch-markdown --output output.md https://huggingface.co/unsloth/GLM-4.6-GGUF
+### 2. Fetch and write to a file
 
-# convert previously saved HTML (files or stdin)
-fetch-markdown /tmp/page.html
-cat page.html | fetch-markdown -
+```bash
+fetch-markdown --output sample-output.md https://www.iana.org/help/example-domains
+```
 
-# skip Markdown conversion and emit the HTML verbatim
+### 3. Convert previously saved HTML (files or stdin)
+
+```bash
+# get html file
+curl -Ss https://www.iana.org/help/example-domains > sample-page.html
+# convert file
+fetch-markdown sample-page.html
+# or from stdin
+cat sample-page.html | fetch-markdown -
+```
+
+### 4. Skip Markdown conversion and emit the HTML verbatim
+
+```bash
 fetch-markdown --raw https://example.com
 ```
 
@@ -47,7 +66,7 @@ fetch-markdown --raw https://example.com
 ```python
 from fetch_markdown import fetch_to_markdown
 
-markdown = fetch_to_markdown("https://huggingface.co/unsloth/GLM-4.6-GGUF")
+markdown = fetch_to_markdown("https://www.iana.org/help/example-domains")
 ```
 
 ### 2. Convert a previously saved HTML file
@@ -55,7 +74,7 @@ markdown = fetch_to_markdown("https://huggingface.co/unsloth/GLM-4.6-GGUF")
 ```python
 from fetch_markdown import file_to_markdown
 
-markdown_from_file = file_to_markdown("/tmp/page.html")
+markdown_from_file = file_to_markdown("sample-page.html")
 ```
 
 ### 3. Convert an HTML string you already have

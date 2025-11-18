@@ -6,3 +6,5 @@ dist/
 **/_version.py
 **/.coverage
 /tmp_submodules/servers/
+sample-output.md
+sample-page.html
