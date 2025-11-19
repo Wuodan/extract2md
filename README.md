@@ -58,6 +58,11 @@ extract2md --raw https://example.com
   enable or disable rewriting relative `href`/`src` attributes to absolute links (default on).
 - `--base-url URL`: optional base URL for rewriting relative urls (default `source`).
 
+## Environment variables
+
+- `EXTRACT2MD_NODE_PATH`: Set the `EXTRACT2MD_NODE_PATH` environment variable to the Node.js binary (or its
+  directory) if Readability.js cannot find `node` on your `PATH`.
+
 ## Python Library usage
 
 `extract2md` can also be used as a Python library.
@@ -115,8 +120,6 @@ raw_html, content_type = fetch("https://example.com/docs")
 
 - The CLI and library both fetch live webpages from URLs; network availability and site
   rate limits apply.
-- Set the `EXTRACT2MD_NODE_PATH` environment variable to the Node.js binary (or its
-  directory) if Readability.js cannot find `node` on your `PATH`.
 - Inspired by the [Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
 - Thanks go to these libraries for the heavy lifting:
     - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
