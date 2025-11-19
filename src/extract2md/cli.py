@@ -25,11 +25,6 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--raw",
-        action="store_true",
-        help="Return raw HTML when simplification is not desired",
-    )
-    parser.add_argument(
         "--user-agent",
         help=(
             "Custom User-Agent header. Defaults to a extract2md specific agent."
@@ -107,14 +102,13 @@ def main(argv: list[str] | None = None) -> int:
             if base_url is None:
                 base_url = source_path.resolve().as_uri()
 
-        if not args.raw:
-            content = html_to_markdown(
-                content,
-                content_type,
-                base_url=base_url,
-                rewrite_relative_urls=args.rewrite_relative_urls,
-                converter=args.converter,
-            )
+        content = html_to_markdown(
+            content,
+            content_type,
+            base_url=base_url,
+            rewrite_relative_urls=args.rewrite_relative_urls,
+            converter=args.converter,
+        )
 
     except (Extract2MarkdownError, ValueError, OSError) as exc:
         parser.exit(1, f"error: {exc}\n")

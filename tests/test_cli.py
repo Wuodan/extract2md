@@ -77,15 +77,15 @@ def test_cli_reads_stdin_source(monkeypatch, capsys):
     monkeypatch.setattr(cli.sys, "stdin", io.StringIO("<html>stdin</html>"))
 
     def fake_html_to_markdown(*args, **kwargs):  # noqa: ANN001
-        raise AssertionError("html_to_markdown should not run when --raw is set")
+        return "converted-stdin"
 
     monkeypatch.setattr(cli, "html_to_markdown", fake_html_to_markdown)
 
-    exit_code = cli.main(["-", "--raw"])
+    exit_code = cli.main(["-"])
     captured = capsys.readouterr()
 
     assert exit_code == 0
-    assert "<html>stdin</html>" in captured.out
+    assert "converted-stdin" in captured.out
 
 
 def test_cli_disable_relative_rewrite(monkeypatch, capsys):

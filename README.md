@@ -39,16 +39,9 @@ extract2md sample-page.html
 cat sample-page.html | extract2md -
 ```
 
-### 4. Skip Markdown conversion and emit the HTML verbatim
-
-```bash
-extract2md --raw https://example.com
-```
-
 ## Parameters
 
 - `source`: URL, filesystem path, or `-` to read HTML from stdin.
-- `--raw`: bypass HTML-to-Markdown conversion and emit the response body.
 - `--user-agent STRING`: override the default identifier.
 - `--ignore-robots`: skip robots.txt validation (use sparingly).
 - `--proxy URL`: HTTP(S) proxy forwarded to httpx.
