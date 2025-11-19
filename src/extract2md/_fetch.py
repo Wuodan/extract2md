@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from urllib.parse import urlparse, urlunparse
 
-from extract2md.models import Html2MarkdownFetchError
+from extract2md.models import Extract2MarkdownFetchError
 from protego import Protego
 
 DEFAULT_USER_AGENT = (
@@ -37,11 +37,11 @@ async def _check_may_fetch_url(
                 headers={"User-Agent": user_agent},
             )
         except HTTPError as exc:  # pragma: no cover - depends on network
-            raise Html2MarkdownFetchError(
+            raise Extract2MarkdownFetchError(
                 f"Failed to fetch robots.txt {robot_txt_url}: {exc}"
             ) from exc
         if response.status_code in (401, 403):
-            raise Html2MarkdownFetchError(
+            raise Extract2MarkdownFetchError(
                 "robots.txt forbids autonomous fetching for this user agent",
             )
         elif 400 <= response.status_code < 500:
@@ -52,7 +52,7 @@ async def _check_may_fetch_url(
     )
     robot_parser = Protego.parse(processed_robot_txt)
     if not robot_parser.can_fetch(str(url), user_agent):
-        raise Html2MarkdownFetchError(
+        raise Extract2MarkdownFetchError(
             "robots.txt disallows fetching this page for the configured user-agent"
         )
 
@@ -76,9 +76,9 @@ async def _fetch_url(
                 timeout=timeout,
             )
         except HTTPError as exc:  # pragma: no cover - depends on network
-            raise Html2MarkdownFetchError(f"Failed to fetch {url}: {exc!r}") from exc
+            raise Extract2MarkdownFetchError(f"Failed to fetch {url}: {exc!r}") from exc
         if response.status_code >= 400:
-            raise Html2MarkdownFetchError(
+            raise Extract2MarkdownFetchError(
                 f"Failed to fetch {url} - status code {response.status_code}",
             )
 

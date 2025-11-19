@@ -57,6 +57,8 @@ extract2md --raw https://example.com
 - `--rewrite-relative-urls/--no-rewrite-relative-urls`:  
   enable or disable rewriting relative `href`/`src` attributes to absolute links (default on).
 - `--base-url URL`: optional base URL for rewriting relative urls (default `source`).
+- `--converter NAME`: choose the HTML conversion backend. Defaults to `trafilatura`;
+  `readability` (requires Node.js) is also available.
 
 ## Environment variables
 
@@ -103,6 +105,9 @@ markdown_custom = html_to_markdown(
     rewrite_relative_urls=False,
     base_url="https://example.com/docs/",
 )
+
+# Pick an alternate conversion backend (e.g., Readability)
+markdown_readability = html_to_markdown(html, converter="readability")
 ```
 
 ### Additional public methods
@@ -125,3 +130,4 @@ raw_html, content_type = fetch("https://example.com/docs")
     - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
       Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package
     - [Markdownify](https://github.com/matthewwithanm/python-markdownify)
+    - [Trafilatura](https://github.com/adbar/trafilatura)

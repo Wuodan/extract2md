@@ -6,10 +6,11 @@ from .core import (
     html_to_markdown,
 )
 from .models import (
-    Html2MarkdownContentTypeError,
-    Html2MarkdownError,
-    Html2MarkdownFetchError,
-    Html2MarkdownToMarkdownError,
+    Extract2MarkdownContentTypeError,
+    Extract2MarkdownConverterError,
+    Extract2MarkdownError,
+    Extract2MarkdownFetchError,
+    Extract2MarkdownToMarkdownError,
 )
 
 __all__ = [
@@ -18,8 +19,9 @@ __all__ = [
     "fetch_to_markdown",
     "file_to_markdown",
     "html_to_markdown",
-    "Html2MarkdownContentTypeError",
-    "Html2MarkdownError",
-    "Html2MarkdownFetchError",
-    "Html2MarkdownToMarkdownError",
+    "Extract2MarkdownContentTypeError",
+    "Extract2MarkdownConverterError",
+    "Extract2MarkdownError",
+    "Extract2MarkdownFetchError",
+    "Extract2MarkdownToMarkdownError",
 ]

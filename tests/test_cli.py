@@ -6,6 +6,7 @@ import io
 from pathlib import Path
 
 from extract2md import cli
+from extract2md.converters import DEFAULT_CONVERTER
 
 
 def test_cli_prints_stdout(monkeypatch, capsys):
@@ -16,16 +17,18 @@ def test_cli_prints_stdout(monkeypatch, capsys):
         return "<html>hello</html>", "text/html"
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert html == "<html>hello</html>"
         assert content_type == "text/html"
         assert base_url == "https://example.com"
         assert rewrite_relative_urls is True
+        assert converter == DEFAULT_CONVERTER
         return "hello"
 
     monkeypatch.setattr(cli, "fetch", fake_fetch)
@@ -45,15 +48,17 @@ def test_cli_writes_file(monkeypatch, tmp_path: Path, capsys):
         return "<html>file</html>", "text/html"
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert content_type == "text/html"
         assert base_url == "https://example.com"
         assert rewrite_relative_urls is True
+        assert converter == DEFAULT_CONVERTER
         return "written"
 
     monkeypatch.setattr(cli, "fetch", fake_fetch)
@@ -80,16 +85,18 @@ def test_cli_reads_file_source(monkeypatch, tmp_path: Path, capsys):
     expected_base = html_file.resolve().as_uri()
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert html == "<html>file</html>"
         assert content_type is None
         assert base_url == expected_base
         assert rewrite_relative_urls is True
+        assert converter == DEFAULT_CONVERTER
         return "converted"
 
     monkeypatch.setattr(cli, "html_to_markdown", fake_html_to_markdown)
@@ -125,14 +132,16 @@ def test_cli_writes_file_from_path_source(monkeypatch, tmp_path: Path, capsys):
     expected_base = html_file.resolve().as_uri()
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert base_url == expected_base
         assert rewrite_relative_urls is True
+        assert converter == DEFAULT_CONVERTER
         return html.upper()
 
     monkeypatch.setattr(cli, "html_to_markdown", fake_html_to_markdown)
@@ -157,13 +166,15 @@ def test_cli_disable_relative_rewrite(monkeypatch, capsys):
         return "<html>body</html>", "text/html"
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert rewrite_relative_urls is False
+        assert converter == DEFAULT_CONVERTER
         return "body"
 
     monkeypatch.setattr(cli, "fetch", fake_fetch)
@@ -181,14 +192,16 @@ def test_cli_base_url_override_for_stdin(monkeypatch, capsys):
     monkeypatch.setattr(cli.sys, "stdin", io.StringIO("<html>stdin</html>"))
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert base_url == "https://override.test"
         assert rewrite_relative_urls is True
+        assert converter == DEFAULT_CONVERTER
         return "converted"
 
     monkeypatch.setattr(cli, "html_to_markdown", fake_html_to_markdown)
@@ -198,3 +211,30 @@ def test_cli_base_url_override_for_stdin(monkeypatch, capsys):
 
     assert exit_code == 0
     assert "converted" in captured.out
+
+
+def test_cli_supports_custom_converter(monkeypatch, capsys):
+    """--converter should be forwarded to html_to_markdown."""
+
+    def fake_fetch(url, **kwargs):  # noqa: ANN001
+        return "<html>body</html>", "text/html"
+
+    def fake_html_to_markdown(  # noqa: ANN001
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
+    ):
+        assert converter == "trafilatura"
+        return "body"
+
+    monkeypatch.setattr(cli, "fetch", fake_fetch)
+    monkeypatch.setattr(cli, "html_to_markdown", fake_html_to_markdown)
+
+    exit_code = cli.main(["https://example.com", "--converter", "trafilatura"])
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "body" in captured.out

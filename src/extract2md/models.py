@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 
-class Html2MarkdownError(RuntimeError):
+class Extract2MarkdownError(RuntimeError):
     """Base class for errors in this package."""
 
 
-class Html2MarkdownContentTypeError(Html2MarkdownError):
+class Extract2MarkdownContentTypeError(Extract2MarkdownError):
     """Raised when HTML cannot be converted to Markdown."""
 
 
-class Html2MarkdownToMarkdownError(Html2MarkdownError):
+class Extract2MarkdownToMarkdownError(Extract2MarkdownError):
     """Raised when HTML cannot be converted to Markdown."""
 
 
-class Html2MarkdownFetchError(Html2MarkdownError):
+class Extract2MarkdownFetchError(Extract2MarkdownError):
     """Raised when a URL cannot be fetched."""
+
+
+class Extract2MarkdownConverterError(Extract2MarkdownError):
+    """Raised when an HTML conversion backend fails."""

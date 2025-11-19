@@ -1,14 +1,54 @@
-"""Tests for the low-level HTML conversion helpers."""
+"""Tests for the HTML conversion helpers and converters."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
 
-from extract2md._html import _ensure_node_path, _extract_content_from_html, to_markdown
+import pytest
+
+from extract2md._html import to_markdown
+from extract2md.converters.readability import ReadabilityConverter, _ensure_node_path
+from extract2md.models import Extract2MarkdownConverterError
 
 
-def test_to_markdown_uses_readability_and_markdownify(monkeypatch):
+def test_to_markdown_delegates_to_named_converter(monkeypatch):
+    """Passing a converter name should be respected."""
+
+    class FakeConverter:
+        name = "fake"
+        description = "fake converter"
+
+        def __init__(self) -> None:
+            self.html = None
+
+        def convert(self, html: str) -> str:
+            self.html = html
+            return "Body"
+
+    fake = FakeConverter()
+
+    def fake_get(name=None):  # noqa: ANN001
+        assert name == "fake"
+        return fake
+
+    monkeypatch.setattr("extract2md._html.get_converter", fake_get)
+
+    html = "<html><body><p>Body</p></body></html>"
+    result = to_markdown(html, converter="fake")
+
+    assert result == "Body"
+    assert fake.html == html
+
+
+def test_to_markdown_unknown_converter_raises() -> None:
+    """Unknown converter names should raise converter errors."""
+    html = "<html><body>content</body></html>"
+    with pytest.raises(Extract2MarkdownConverterError):
+        to_markdown(html, converter="doesnotexist")
+
+
+def test_readability_converter_uses_readability_and_markdownify(monkeypatch):
     """Successful conversion should invoke both readabilipy and markdownify."""
     recorded = {}
 
@@ -23,38 +63,37 @@ def test_to_markdown_uses_readability_and_markdownify(monkeypatch):
         return "Body"
 
     monkeypatch.setattr(
-        "extract2md._html.readabilipy.simple_json.simple_json_from_html_string",
+        "extract2md.converters.readability.readabilipy.simple_json.simple_json_from_html_string",
         fake_simple_json_from_html_string,
     )
     monkeypatch.setattr(
-        "extract2md._html.markdownify.markdownify",
+        "extract2md.converters.readability.markdownify.markdownify",
         fake_markdownify,
     )
 
-    html = "<html><body><p>Body</p></body></html>"
-    result = to_markdown(html)
+    converter = ReadabilityConverter()
+    result = converter.convert("<html><body><p>Body</p></body></html>")
 
     assert result == "Body"
-    assert recorded["html"] == html
+    assert recorded["html"] == "<html><body><p>Body</p></body></html>"
     assert recorded["use_readability"] is True
     assert recorded["markdown_input"] == "<p>Body</p>"
 
 
-def test_extract_content_handles_empty_payload(monkeypatch):
-    """Empty Readability content should produce an explicit error marker."""
+def test_readability_converter_handles_empty_payload(monkeypatch):
+    """Empty Readability content should raise a clear error."""
 
     def fake_simple_json_from_html_string(*args, **kwargs):  # noqa: ANN001
         return {"content": ""}
 
     monkeypatch.setattr(
-        "extract2md._html.readabilipy.simple_json.simple_json_from_html_string",
+        "extract2md.converters.readability.readabilipy.simple_json.simple_json_from_html_string",
         fake_simple_json_from_html_string,
     )
 
-    assert (
-            _extract_content_from_html("<html></html>")
-            == "<error>Page failed to be simplified from HTML</error>"
-    )
+    converter = ReadabilityConverter()
+    with pytest.raises(Extract2MarkdownConverterError):
+        converter.convert("<html></html>")
 
 
 def test_ensure_node_path_inserts_directory(monkeypatch, tmp_path: Path):

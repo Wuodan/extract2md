@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 from extract2md import (
-    Html2MarkdownContentTypeError,
+    Extract2MarkdownContentTypeError,
     fetch_to_markdown,
     file_to_markdown,
     html_to_markdown,
@@ -31,7 +31,7 @@ def test_file_to_markdown_reads_content(tmp_path) -> None:
 
 def test_html_to_markdown_rejects_non_html() -> None:
     """Non-HTML content-types must produce a clear error."""
-    with pytest.raises(Html2MarkdownContentTypeError):
+    with pytest.raises(Extract2MarkdownContentTypeError):
         html_to_markdown("just text", content_type="text/plain")
 
 
@@ -42,7 +42,7 @@ def test_html_to_markdown_makes_relative_links_absolute(monkeypatch) -> None:
         assert base_url == "https://example.com/home/"
         return '<html><body><a href="https://example.com/docs">Docs</a></body></html>'
 
-    def fake_to_markdown(html, content_type=None):  # noqa: ANN001
+    def fake_to_markdown(html, content_type=None, *, converter=None):  # noqa: ANN001
         assert "https://example.com/docs" in html
         return "[Docs](https://example.com/docs)"
 
@@ -60,7 +60,7 @@ def test_html_to_markdown_can_skip_relative_rewrite(monkeypatch) -> None:
     def fake_rewrite(*args, **kwargs):  # noqa: ANN001
         raise AssertionError("rewrite_relative_links should not run")
 
-    def fake_to_markdown(html, content_type=None):  # noqa: ANN001
+    def fake_to_markdown(html, content_type=None, *, converter=None):  # noqa: ANN001
         assert '<a href="/docs">Docs</a>' in html
         return "[Docs](/docs)"
 
@@ -82,11 +82,12 @@ def test_file_to_markdown_accepts_custom_base_url(monkeypatch, tmp_path) -> None
     html_file.write_text("<html>content</html>", encoding="utf-8")
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert base_url == "https://override/"
         assert rewrite_relative_urls is False
@@ -110,11 +111,12 @@ def test_fetch_to_markdown_allows_custom_base_url(monkeypatch) -> None:
         return "<html></html>", "text/html"
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert base_url == "https://override/"
         assert rewrite_relative_urls is False
@@ -139,11 +141,12 @@ def test_fetch_to_markdown_defaults_base_url_to_source(monkeypatch) -> None:
         return "<html></html>", "text/html"
 
     def fake_html_to_markdown(  # noqa: ANN001
-            html,
-            content_type=None,
-            *,
-            base_url=None,
-            rewrite_relative_urls=None,
+        html,
+        content_type=None,
+        *,
+        base_url=None,
+        rewrite_relative_urls=None,
+        converter=None,
     ):
         assert base_url == "https://example.com/article"
         return "converted"

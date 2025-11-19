@@ -7,8 +7,9 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .converters import DEFAULT_CONVERTER, get_converter_names
 from .core import DEFAULT_USER_AGENT, fetch, html_to_markdown
-from .models import Html2MarkdownError
+from .models import Extract2MarkdownError
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -16,6 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Fetch a web page and output cleaned Markdown",
     )
+    converter_names = get_converter_names()
     parser.add_argument(
         "source",
         help=(
@@ -66,6 +68,12 @@ def build_parser() -> argparse.ArgumentParser:
             "Optional base URL used to resolve relative links for stdin or file sources "
             "(overrides automatic detection)"
         ),
+    )
+    parser.add_argument(
+        "--converter",
+        choices=converter_names,
+        default=DEFAULT_CONVERTER,
+        help="Choose the HTML conversion strategy (default: %(default)s)",
     )
     return parser
 
@@ -118,12 +126,13 @@ def main(argv: list[str] | None = None) -> int:
                 content_type,
                 base_url=base_url,
                 rewrite_relative_urls=args.rewrite_relative_urls,
+                converter=args.converter,
             )
 
         if args.output is not None:
             _write_output_file(content, args.output)
 
-    except (Html2MarkdownError, ValueError, OSError) as exc:
+    except (Extract2MarkdownError, ValueError, OSError) as exc:
         parser.exit(1, f"error: {exc}\n")
 
     if args.output is None:

@@ -19,6 +19,7 @@ def html_to_markdown(
         *,
         base_url: str | None = None,
         rewrite_relative_urls: bool = True,
+        converter: str | None = None,
 ) -> str:
     """Convert HTML into Markdown."""
 
@@ -27,7 +28,7 @@ def html_to_markdown(
         if rewrite_relative_urls
         else html
     )
-    return to_markdown(processed_html, content_type)
+    return to_markdown(processed_html, content_type, converter=converter)
 
 
 def file_to_markdown(
@@ -36,6 +37,7 @@ def file_to_markdown(
         encoding: str | None = "utf-8",
         base_url: str | None = None,
         rewrite_relative_urls: bool = True,
+        converter: str | None = None,
 ) -> str:
     """Convert a local HTML file into Markdown."""
 
@@ -46,6 +48,7 @@ def file_to_markdown(
         html,
         base_url=resolved_base_url,
         rewrite_relative_urls=rewrite_relative_urls,
+        converter=converter,
     )
 
 
@@ -77,6 +80,7 @@ def fetch_to_markdown(
         timeout: float = 30.0,
         base_url: str | None = None,
         rewrite_relative_urls: bool = True,
+        converter: str | None = None,
 ) -> str:
     """Fetch the given URL and return the simplified Markdown content."""
 
@@ -92,6 +96,7 @@ def fetch_to_markdown(
         content_type,
         base_url=base_url or url,
         rewrite_relative_urls=rewrite_relative_urls,
+        converter=converter,
     )
 
 

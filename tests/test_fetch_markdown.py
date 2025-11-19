@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from extract2md import Html2MarkdownError, fetch_to_markdown
+from extract2md import Extract2MarkdownError, fetch_to_markdown
 
 Example_URL = "https://www.iana.org/help/example-domains"
 
@@ -13,7 +13,7 @@ def test_fetch_to_markdown(tmp_path) -> None:
     """Fetch real content from iana.org and persist the resulting Markdown."""
     try:
         markdown = fetch_to_markdown(Example_URL)
-    except Html2MarkdownError as exc:  # pragma: no cover - depends on network
+    except Extract2MarkdownError as exc:  # pragma: no cover - depends on network
         # Networking hiccups shouldn't fail the suite; treat them as skipped.
         pytest.skip(f"Unable to contact iana.org: {exc}")
 
