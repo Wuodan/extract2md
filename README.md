@@ -43,24 +43,24 @@ cat sample-page.html | extract2md -
 
 `Usage: extract2md [OPTIONS] SOURCE`
 
-**Global**
+### Global
 
 - `source`: HTTP(S) URL, filesystem path, or `-` when reading HTML from stdin.
 
-**Fetching (URL sources only)**
+### Fetching (URL sources only)
 
 - `--ignore-robots`: skip robots.txt validation (use sparingly).
 - `--proxy URL`: HTTP(S) proxy forwarded to httpx.
 - `--timeout SECONDS`: request timeout (default 30 seconds).
 - `--user-agent STRING`: override the default identifier.
 
-**HTML rewriting**
+### HTML rewriting
 
 - `--rewrite-relative-urls/--no-rewrite-relative-urls`: enable or disable rewriting relative `href`/`src`
   attributes to absolute links (default on).
 - `--base-url URL`: optional base URL for rewriting relative URLs (default `source`).
 
-**Conversion**
+### Conversion
 
 - `--converter NAME`: choose the HTML conversion backend. Defaults to `trafilatura`;
   `readability` (requires Node.js) is also available.
@@ -132,7 +132,7 @@ raw_html, content_type = fetch("https://example.com/docs")
   rate limits apply.
 - Inspired by the [Fetch MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch).
 - Thanks go to these libraries for the heavy lifting:
-    - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
-      Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package
-    - [Markdownify](https://github.com/matthewwithanm/python-markdownify)
-    - [Trafilatura](https://github.com/adbar/trafilatura)
+  - [ReadabiliPy](https://github.com/alan-turing-institute/ReadabiliPy) with
+    Mozilla's [Readability.js](https://github.com/mozilla/readability) Node.js package
+  - [Markdownify](https://github.com/matthewwithanm/python-markdownify)
+  - [Trafilatura](https://github.com/adbar/trafilatura)
